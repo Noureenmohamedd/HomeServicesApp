@@ -19,8 +19,14 @@ public class NotificationConsumer {
         notificationStore.save(message, RecipientType.SERVICE_PROVIDER, message.serviceProviderId());
     }
 
-    @RabbitListener(queues = RabbitMqConfig.BOOKING_FAILURE_QUEUE)
-    public void consumeBookingFailure(NotificationMessage message) {
+    @RabbitListener(queues = RabbitMqConfig.BOOKING_REJECTION_QUEUE)
+    public void consumeBookingRejection(NotificationMessage message) {
         notificationStore.save(message, RecipientType.CUSTOMER, message.customerId());
+    }
+
+    @RabbitListener(queues = RabbitMqConfig.BOOKING_COMPLETION_QUEUE)
+    public void consumeBookingCompletion(NotificationMessage message) {
+        notificationStore.save(message, RecipientType.CUSTOMER, message.customerId());
+        notificationStore.save(message, RecipientType.SERVICE_PROVIDER, message.serviceProviderId());
     }
 }

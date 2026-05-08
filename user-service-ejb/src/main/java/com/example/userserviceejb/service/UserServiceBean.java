@@ -189,6 +189,27 @@ public class UserServiceBean {
         return updatedBalance.doubleValue();
     }
 
+    public double refundWallet(Long userId, double amount) {
+        if (Double.isNaN(amount) || Double.isInfinite(amount) || amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+
+        User user = getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        BigDecimal refundAmount = BigDecimal.valueOf(amount);
+        BigDecimal updatedBalance = user.getBalance().add(refundAmount);
+        user.setBalance(updatedBalance);
+        recordTransaction(
+                user,
+                "BOOKING_REFUND",
+                refundAmount,
+                updatedBalance,
+                "Wallet refunded after booking rollback"
+        );
+        return updatedBalance.doubleValue();
+    }
+
     public List<TransactionRecord> getAllTransactionRecords() {
         return entityManager
                 .createQuery("SELECT t FROM TransactionRecord t ORDER BY t.createdAt DESC, t.id DESC", TransactionRecord.class)

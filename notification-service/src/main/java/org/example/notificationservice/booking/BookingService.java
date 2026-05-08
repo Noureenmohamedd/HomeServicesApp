@@ -2,7 +2,6 @@ package org.example.notificationservice.booking;
 
 import org.example.notificationservice.notification.NotificationMessage;
 import org.example.notificationservice.notification.NotificationPublisher;
-import org.example.notificationservice.notification.NotificationType;
 import org.example.notificationservice.wallet.WalletEJB;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +25,16 @@ public class BookingService {
 
         if (!walletEJB.hasSufficientBalance(request.customerId(), request.price())) {
             NotificationMessage failure = new NotificationMessage(
-                    NotificationType.BOOKING_REJECTION,
-                    "Your booking was rejected because your wallet balance is insufficient.",
+                    "BOOKING_REJECTED",
+                    bookingId,
                     request.customerId(),
                     request.serviceProviderId(),
-                    bookingId,
+                    null,
                     request.serviceName(),
+                    null,
+                    "REJECTED",
                     request.price(),
-                    "rejected"
+                    "Your booking was rejected because your wallet balance is insufficient."
             );
             notificationPublisher.publishBookingFailure(failure);
             return new BookingResponse(
@@ -51,14 +52,16 @@ public class BookingService {
         BigDecimal remainingBalance = walletEJB.deduct(request.customerId(), request.price());
         try {
             NotificationMessage confirmation = new NotificationMessage(
-                    NotificationType.BOOKING_CONFIRMATION,
-                    "Your booking has been confirmed with the " + request.serviceName() + ".",
+                    "BOOKING_CONFIRMED",
+                    bookingId,
                     request.customerId(),
                     request.serviceProviderId(),
-                    bookingId,
+                    null,
                     request.serviceName(),
+                    null,
+                    "CONFIRMED",
                     request.price(),
-                    "confirmed"
+                    "Your booking has been confirmed with the " + request.serviceName() + "."
             );
             notificationPublisher.publishBookingConfirmation(confirmation);
             return new BookingResponse(
@@ -74,14 +77,16 @@ public class BookingService {
         } catch (RuntimeException ex) {
             BigDecimal restoredBalance = walletEJB.refund(request.customerId(), request.price());
             NotificationMessage failure = new NotificationMessage(
-                    NotificationType.BOOKING_REJECTION,
-                    "Your booking failed and the deducted amount was returned to your wallet.",
+                    "BOOKING_REJECTED",
+                    bookingId,
                     request.customerId(),
                     request.serviceProviderId(),
-                    bookingId,
+                    null,
                     request.serviceName(),
+                    null,
+                    "REJECTED",
                     request.price(),
-                    "rejected"
+                    "Your booking failed and the deducted amount was returned to your wallet."
             );
             notificationPublisher.publishBookingFailure(failure);
             return new BookingResponse(

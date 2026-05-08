@@ -1,0 +1,892 @@
+{
+  "info": {
+    "_postman_id": "33b479cd-ea3b-4de2-9b2b-f8596ffcfa4e",
+    "name": "HomeServiceEndpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "38514490",
+    "_collection_link": "https://go.postman.co/collection/38514490-33b479cd-ea3b-4de2-9b2b-f8596ffcfa4e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "CustomerRegisteration",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"nour\",\r\n  \"password\": \"123\",\r\n  \"balance\": 1000\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/users/register/customer",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "users",
+            "register",
+            "customer"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ProviderRegisteration",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"alyM\",\r\n  \"password\": \"1234\",\r\n  \"professionType\": \"PLUMBER\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/users/register/provider",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "users",
+            "register",
+            "provider"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "register as admin",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"admin1\",\r\n  \"password\": \"123\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/admin/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "admin",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login provider",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"alyM\",\r\n  \"password\": \"1234\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/users/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login customer",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"nour\",\r\n  \"password\": \"123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/users/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login as admin",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"admin3\",\r\n  \"password\": \"123\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/users/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Money To Wallet",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": 5000\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/users/wallet/add/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "users",
+            "wallet",
+            "add",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Wallet Balance",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/users/wallet/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "users",
+            "wallet",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "deducted from wallet",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"amount\": 100\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/users/wallet/deduct/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "users",
+            "wallet",
+            "deduct",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get all users",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MCIsInVzZXJuYW1lIjoiYWRtaW4zIiwicm9sZSI6IkFETUlOIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5NTc1MiwiZXhwIjoxNzc4MjAyOTUyfQ.lRU6J35IsGBaX0kwBNFUpZibIkhoNVXP6Y4MEa7e8yU",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/admin/users/registered",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "admin",
+            "users",
+            "registered"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get all admins",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MCIsInVzZXJuYW1lIjoiYWRtaW4zIiwicm9sZSI6IkFETUlOIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5NTc1MiwiZXhwIjoxNzc4MjAyOTUyfQ.lRU6J35IsGBaX0kwBNFUpZibIkhoNVXP6Y4MEa7e8yU",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/admin/users/admins",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "admin",
+            "users",
+            "admins"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "admin see wallet transactions history (booking)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MCIsInVzZXJuYW1lIjoiYWRtaW4zIiwicm9sZSI6IkFETUlOIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5NTc1MiwiZXhwIjoxNzc4MjAyOTUyfQ.lRU6J35IsGBaX0kwBNFUpZibIkhoNVXP6Y4MEa7e8yU",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/user-service-ejb-1.0-SNAPSHOT/api/admin/transactions",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "user-service-ejb-1.0-SNAPSHOT",
+            "api",
+            "admin",
+            "transactions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "browse by category for customer",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwidXNlcm5hbWUiOiJub3VyIiwicm9sZSI6IkNVU1RPTUVSIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5OTQwMSwiZXhwIjoxNzc4MjA2NjAxfQ.qnwyTrjNuDOhAp4bmKWOSUnYziJSCenS2MkkRpx-t0Y",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/offers/category/plumbing",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "offers",
+            "category",
+            "plumbing"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "view active services for provider",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwidXNlcm5hbWUiOiJhbHlNIiwicm9sZSI6IlBST1ZJREVSIiwicHJvZmVzc2lvblR5cGUiOiJQTFVNQkVSIiwiaWF0IjoxNzc4MjAwNDEzLCJleHAiOjE3NzgyMDc2MTN9.rVXn3Z83eHgLhZK50VUML0jERlGJdU8DqZqJWCsIAQA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/offers/active",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "offers",
+            "active"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create offer",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwidXNlcm5hbWUiOiJhbHlNIiwicm9sZSI6IlBST1ZJREVSIiwicHJvZmVzc2lvblR5cGUiOiJQTFVNQkVSIiwiaWF0IjoxNzc4MjAwNDEzLCJleHAiOjE3NzgyMDc2MTN9.rVXn3Z83eHgLhZK50VUML0jERlGJdU8DqZqJWCsIAQA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Pipe Repair3333\",\r\n  \"description\": \"Fix leaking kitchen or bathroom pipes\",\r\n  \"price\": 80,\r\n  \"category\": \"PLUMBING\",\r\n  \"availableDateTime\": \"2026-05-09T10:00:00\",\r\n  \"availabilityStatus\": \"AVAILABLE\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/offers",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "offers"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update offer",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwidXNlcm5hbWUiOiJhbHlNIiwicm9sZSI6IlBST1ZJREVSIiwicHJvZmVzc2lvblR5cGUiOiJQTFVNQkVSIiwiaWF0IjoxNzc4MjAwNDEzLCJleHAiOjE3NzgyMDc2MTN9.rVXn3Z83eHgLhZK50VUML0jERlGJdU8DqZqJWCsIAQA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"availabilityStatus\": \"UNAVAILABLE\",\r\n    \"title\": \"Pipe Repair2\",\r\n    \"price\": 6\r\n   \r\n\r\n \r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/offers/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "offers",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add service for admin",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MCIsInVzZXJuYW1lIjoiYWRtaW4zIiwicm9sZSI6IkFETUlOIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5NTc1MiwiZXhwIjoxNzc4MjAyOTUyfQ.lRU6J35IsGBaX0kwBNFUpZibIkhoNVXP6Y4MEa7e8yU",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"houskeeping\",\r\n  \"professionType\": \"HOUSE\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8081/api/admin/categories",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "admin",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get service for admin",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MCIsInVzZXJuYW1lIjoiYWRtaW4zIiwicm9sZSI6IkFETUlOIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5NTc1MiwiZXhwIjoxNzc4MjAyOTUyfQ.lRU6J35IsGBaX0kwBNFUpZibIkhoNVXP6Y4MEa7e8yU",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8081/api/admin/categories",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "api",
+            "admin",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "bookOffer",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwidXNlcm5hbWUiOiJub3VyIiwicm9sZSI6IkNVU1RPTUVSIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5OTQwMSwiZXhwIjoxNzc4MjA2NjAxfQ.qnwyTrjNuDOhAp4bmKWOSUnYziJSCenS2MkkRpx-t0Y",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"offerId\": 2\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8082/api/bookings",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "bookings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "booking history by id",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwidXNlcm5hbWUiOiJub3VyIiwicm9sZSI6IkNVU1RPTUVSIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5OTQwMSwiZXhwIjoxNzc4MjA2NjAxfQ.qnwyTrjNuDOhAp4bmKWOSUnYziJSCenS2MkkRpx-t0Y",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/api/bookings/customer/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "bookings",
+            "customer",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "complete booking for customer",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwidXNlcm5hbWUiOiJhbHlNIiwicm9sZSI6IlBST1ZJREVSIiwicHJvZmVzc2lvblR5cGUiOiJQTFVNQkVSIiwiaWF0IjoxNzc4MjAwNDEzLCJleHAiOjE3NzgyMDc2MTN9.rVXn3Z83eHgLhZK50VUML0jERlGJdU8DqZqJWCsIAQA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/api/bookings/1/complete",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "bookings",
+            "1",
+            "complete"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get bookings for an offer by id",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJub3VyZWVuIiwicm9sZSI6IkNVU1RPTUVSIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE1MjAxNiwiZXhwIjoxNzc4MTU5MjE2fQ.HgqPbhKIHkH1XLBquNb-LPo3hl6Ee7ODu2U_wxsTP48",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/api/bookings/offer/4",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "bookings",
+            "offer",
+            "4"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "view completed services with details (prov)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwidXNlcm5hbWUiOiJhbHlNIiwicm9sZSI6IlBST1ZJREVSIiwicHJvZmVzc2lvblR5cGUiOiJQTFVNQkVSIiwiaWF0IjoxNzc4MjAwNDEzLCJleHAiOjE3NzgyMDc2MTN9.rVXn3Z83eHgLhZK50VUML0jERlGJdU8DqZqJWCsIAQA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/api/bookings/provider/3/completed",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "bookings",
+            "provider",
+            "3",
+            "completed"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "View all transaction history for all users (booking records) (admin)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MCIsInVzZXJuYW1lIjoiYWRtaW4zIiwicm9sZSI6IkFETUlOIiwicHJvZmVzc2lvblR5cGUiOiJPVEhFUiIsImlhdCI6MTc3ODE5NTc1MiwiZXhwIjoxNzc4MjAyOTUyfQ.lRU6J35IsGBaX0kwBNFUpZibIkhoNVXP6Y4MEa7e8yU",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8082/api/bookings/admin/all",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "bookings",
+            "admin",
+            "all"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "view booking info for provider (with prov id)",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwidXNlcm5hbWUiOiJhbHlNIiwicm9sZSI6IlBST1ZJREVSIiwicHJvZmVzc2lvblR5cGUiOiJQTFVNQkVSIiwiaWF0IjoxNzc4MjAwNDEzLCJleHAiOjE3NzgyMDc2MTN9.rVXn3Z83eHgLhZK50VUML0jERlGJdU8DqZqJWCsIAQA",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"offerId\": 4\r\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8082/api/bookings/provider/3",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "api",
+            "bookings",
+            "provider",
+            "3"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get notf for provider",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8084/api/notifications/providers/3",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8084",
+          "path": [
+            "api",
+            "notifications",
+            "providers",
+            "3"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get notification of customer",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8084/api/notifications/customers/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8084",
+          "path": [
+            "api",
+            "notifications",
+            "customers",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

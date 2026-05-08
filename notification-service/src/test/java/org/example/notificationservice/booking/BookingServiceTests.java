@@ -55,7 +55,7 @@ class BookingServiceTests {
         verify(notificationPublisher).publishBookingFailure(argThat(message ->
                 message.type() == NotificationType.BOOKING_REJECTION
                         && message.customerId().equals(1L)
-                        && message.status().equals("rejected")
+                        && message.status().equals("REJECTED")
         ));
         verify(notificationPublisher, never()).publishBookingConfirmation(org.mockito.ArgumentMatchers.any());
     }
@@ -66,6 +66,6 @@ class BookingServiceTests {
                 && message.serviceProviderId().equals(2L)
                 && message.serviceName().equals("plumber")
                 && message.amount().compareTo(BigDecimal.valueOf(80)) == 0
-                && message.status().equals("confirmed");
+                && message.status().equals("CONFIRMED");
     }
 }

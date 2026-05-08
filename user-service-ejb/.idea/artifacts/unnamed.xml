@@ -1,6 +1,8 @@
 <component name="ArtifactManager">
-  <artifact name="unnamed">
-    <output-path>$PROJECT_DIR$/out/artifacts/unnamed</output-path>
-    <root id="root" />
+  <artifact type="exploded-war" name="user-service-ejb-1.0-SNAPSHOT">
+    <output-path>$PROJECT_DIR$/out/artifacts/user_service_ejb_1_0_SNAPSHOT</output-path>
+    <root id="root">
+      <element id="dir-copy" path="$PROJECT_DIR$/target/user-service-ejb-1.0-SNAPSHOT" />
+    </root>
   </artifact>
 </component>

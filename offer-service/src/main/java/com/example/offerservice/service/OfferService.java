@@ -25,9 +25,6 @@ public class OfferService {
             "Provider cannot create offers outside their profession category";
     private static final String PAST_AVAILABILITY_ERROR =
             "Available date and time cannot be in the past";
-    private static final String EMPTY_UPDATE_ERROR =
-            "At least one of price, availableDateTime, or availabilityStatus is required";
-
     private final OfferRepository offerRepository;
     private final ExternalServiceClient externalServiceClient;
     private final ServiceCategoryService serviceCategoryService;
@@ -52,7 +49,7 @@ public class OfferService {
             String professionType
     ) {
         validateProfessionCanCreateCategory(professionType, request.getCategory());
-        String availabilityStatus = normalizeAvailabilityStatus(request.getAvailabilityStatus());
+        String availabilityStatus = normalizeAvailabilityStatus(request.getAvailabilityStatus(), AvailabilityStatus.AVAILABLE.name());
         validateAvailableDateTime(request.getAvailableDateTime(), availabilityStatus);
 
         Offer offer = Offer.builder()
@@ -124,21 +121,30 @@ public class OfferService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Provider can only update his own offers");
         }
 
+        boolean hasTitle = hasText(request.getTitle());
+        boolean hasDescription = hasText(request.getDescription());
         boolean hasPrice = request.getPrice() != null;
+        boolean hasCategory = hasText(request.getCategory());
         boolean hasAvailableDateTime = request.getAvailableDateTime() != null;
         boolean hasAvailabilityStatus = request.getAvailabilityStatus() != null
                 && !request.getAvailabilityStatus().isBlank();
 
-        if (!hasPrice && !hasAvailableDateTime && !hasAvailabilityStatus) {
-            throw new IllegalArgumentException(EMPTY_UPDATE_ERROR);
-        }
-
         String availabilityStatus = hasAvailabilityStatus
-                ? normalizeAvailabilityStatus(request.getAvailabilityStatus())
+                ? normalizeAvailabilityStatus(request.getAvailabilityStatus(), null)
                 : offer.getAvailabilityStatus();
 
+        if (hasTitle) {
+            offer.setTitle(request.getTitle().trim());
+        }
+        if (hasDescription) {
+            offer.setDescription(request.getDescription().trim());
+        }
         if (hasPrice) {
             offer.setPrice(request.getPrice());
+        }
+        if (hasCategory) {
+            validateProfessionCanCreateCategory(offer.getProviderProfessionType(), request.getCategory());
+            offer.setCategory(normalizeCategory(request.getCategory()));
         }
         if (hasAvailableDateTime) {
             validateAvailableDateTime(request.getAvailableDateTime(), availabilityStatus);
@@ -182,7 +188,6 @@ public class OfferService {
                 .title(offer.getTitle())
                 .description(offer.getDescription())
                 .price(offer.getPrice())
-                .available(offer.isAvailable())
                 .category(offer.getCategory())
                 .availableDateTime(offer.getAvailableDateTime())
                 .availabilityStatus(getAvailabilityStatus(offer))
@@ -195,7 +200,10 @@ public class OfferService {
 
         if (providerUsername == null || providerUsername.isBlank()
                 || providerProfessionType == null || providerProfessionType.isBlank()) {
-            var providerProfile = externalServiceClient.fetchProviderProfile(offer.getProviderId(), authorizationHeader);
+            ExternalServiceClient.ProviderProfile providerProfile = externalServiceClient.fetchProviderProfile(
+                    offer.getProviderId(),
+                    authorizationHeader
+            );
             if (providerProfile != null) {
                 providerUsername = providerProfile.username();
                 providerProfessionType = providerProfile.professionType();
@@ -209,7 +217,6 @@ public class OfferService {
                 .description(offer.getDescription())
                 .category(offer.getCategory())
                 .price(offer.getPrice())
-                .available(offer.isAvailable())
                 .availabilityStatus(getAvailabilityStatus(offer))
                 .availableDateTime(offer.getAvailableDateTime())
                 .providerId(offer.getProviderId())
@@ -247,31 +254,29 @@ public class OfferService {
     }
 
     private String getAvailabilityStatus(Offer offer) {
-        if (!offer.isAvailable()) {
+        if (!isAvailableStatus(offer.getAvailabilityStatus())) {
             return AvailabilityStatus.UNAVAILABLE.name();
         }
-        if (offer.getAvailabilityStatus() != null && !offer.getAvailabilityStatus().isBlank()) {
-            return offer.getAvailabilityStatus();
-        }
-
-        LocalDateTime availableDateTime = offer.getAvailableDateTime();
-        if (availableDateTime != null && !availableDateTime.isBefore(nowUtc())) {
-            return AvailabilityStatus.FUTURE_AVAILABLE.name();
-        }
-        return AvailabilityStatus.EXPIRED.name();
+        return AvailabilityStatus.AVAILABLE.name();
     }
 
-    private String normalizeAvailabilityStatus(String availabilityStatus) {
+    private String normalizeAvailabilityStatus(String availabilityStatus, String defaultStatus) {
         if (availabilityStatus == null || availabilityStatus.isBlank()) {
-            return null;
+            return defaultStatus;
         }
 
-        String normalizedStatus = availabilityStatus.trim().toUpperCase(Locale.ROOT);
-        try {
-            return AvailabilityStatus.valueOf(normalizedStatus).name();
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException("Invalid availability status: " + availabilityStatus);
+        String normalizedStatus = availabilityStatus.trim()
+                .replace(' ', '_')
+                .replace('-', '_')
+                .toUpperCase(Locale.ROOT);
+        if ("NOT_AVAILABLE".equals(normalizedStatus)) {
+            normalizedStatus = AvailabilityStatus.UNAVAILABLE.name();
         }
+        if (AvailabilityStatus.AVAILABLE.name().equals(normalizedStatus)
+                || AvailabilityStatus.UNAVAILABLE.name().equals(normalizedStatus)) {
+            return normalizedStatus;
+        }
+        throw new IllegalArgumentException("Availability status must be AVAILABLE or UNAVAILABLE");
     }
 
     private void validateAvailableDateTime(LocalDateTime availableDateTime, String availabilityStatus) {
@@ -285,23 +290,21 @@ public class OfferService {
     }
 
     private boolean isManuallyAvailable(Offer offer) {
-        return offer.isAvailable()
-                && AvailabilityStatus.AVAILABLE.name().equalsIgnoreCase(offer.getAvailabilityStatus());
+        return isAvailableStatus(offer.getAvailabilityStatus());
     }
 
     private boolean isAutomaticallyAvailable(Offer offer) {
-        return offer.isAvailable()
-                && offer.getAvailabilityStatus() == null
+        return isAvailableStatus(offer.getAvailabilityStatus())
                 && offer.getAvailableDateTime() != null
                 && !offer.getAvailableDateTime().isBefore(nowUtc());
     }
 
     private boolean isAvailableStatus(String availabilityStatus) {
-        if (availabilityStatus == null || availabilityStatus.isBlank()) {
-            return true;
-        }
-        return AvailabilityStatus.AVAILABLE.name().equalsIgnoreCase(availabilityStatus)
-                || AvailabilityStatus.FUTURE_AVAILABLE.name().equalsIgnoreCase(availabilityStatus);
+        return AvailabilityStatus.AVAILABLE.name().equalsIgnoreCase(availabilityStatus);
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 
     private LocalDateTime nowUtc() {

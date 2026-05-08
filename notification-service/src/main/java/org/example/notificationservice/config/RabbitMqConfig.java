@@ -2,8 +2,8 @@ package org.example.notificationservice.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -12,15 +12,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMqConfig {
 
-    public static final String BOOKING_EXCHANGE = "booking.notifications.exchange";
-    public static final String BOOKING_CONFIRMATION_QUEUE = "booking.confirmation.notifications.queue";
-    public static final String BOOKING_FAILURE_QUEUE = "booking.failure.notifications.queue";
+    public static final String BOOKING_EXCHANGE = "booking.exchange";
+    public static final String BOOKING_CONFIRMATION_QUEUE = "booking.confirmed.notifications.queue";
+    public static final String BOOKING_REJECTION_QUEUE = "booking.rejected.notifications.queue";
+    public static final String BOOKING_COMPLETION_QUEUE = "booking.completed.notifications.queue";
     public static final String BOOKING_CONFIRMATION_ROUTING_KEY = "booking.confirmed";
-    public static final String BOOKING_FAILURE_ROUTING_KEY = "booking.failed";
+    public static final String BOOKING_REJECTION_ROUTING_KEY = "booking.rejected";
+    public static final String BOOKING_COMPLETION_ROUTING_KEY = "booking.completed";
 
     @Bean
-    DirectExchange bookingNotificationsExchange() {
-        return new DirectExchange(BOOKING_EXCHANGE);
+    TopicExchange bookingNotificationsExchange() {
+        return new TopicExchange(BOOKING_EXCHANGE);
     }
 
     @Bean
@@ -29,22 +31,34 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    Queue bookingFailureQueue() {
-        return new Queue(BOOKING_FAILURE_QUEUE, true);
+    Queue bookingRejectionQueue() {
+        return new Queue(BOOKING_REJECTION_QUEUE, true);
     }
 
     @Bean
-    Binding bookingConfirmationBinding(Queue bookingConfirmationQueue, DirectExchange bookingNotificationsExchange) {
+    Queue bookingCompletionQueue() {
+        return new Queue(BOOKING_COMPLETION_QUEUE, true);
+    }
+
+    @Bean
+    Binding bookingConfirmationBinding(Queue bookingConfirmationQueue, TopicExchange bookingNotificationsExchange) {
         return BindingBuilder.bind(bookingConfirmationQueue)
                 .to(bookingNotificationsExchange)
                 .with(BOOKING_CONFIRMATION_ROUTING_KEY);
     }
 
     @Bean
-    Binding bookingFailureBinding(Queue bookingFailureQueue, DirectExchange bookingNotificationsExchange) {
-        return BindingBuilder.bind(bookingFailureQueue)
+    Binding bookingRejectionBinding(Queue bookingRejectionQueue, TopicExchange bookingNotificationsExchange) {
+        return BindingBuilder.bind(bookingRejectionQueue)
                 .to(bookingNotificationsExchange)
-                .with(BOOKING_FAILURE_ROUTING_KEY);
+                .with(BOOKING_REJECTION_ROUTING_KEY);
+    }
+
+    @Bean
+    Binding bookingCompletionBinding(Queue bookingCompletionQueue, TopicExchange bookingNotificationsExchange) {
+        return BindingBuilder.bind(bookingCompletionQueue)
+                .to(bookingNotificationsExchange)
+                .with(BOOKING_COMPLETION_ROUTING_KEY);
     }
 
     @Bean

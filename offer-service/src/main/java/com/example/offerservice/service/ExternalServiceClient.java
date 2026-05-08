@@ -2,7 +2,6 @@ package com.example.offerservice.service;
 
 import com.example.offerservice.dto.BookingSummaryResponse;
 import com.example.offerservice.dto.CompletedProviderOfferResponse;
-import com.example.offerservice.dto.ProviderProfileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,14 +48,14 @@ public class ExternalServiceClient {
         }
     }
 
-    public ProviderProfileResponse fetchProviderProfile(Long providerId, String authorizationHeader) {
+    public ProviderProfile fetchProviderProfile(Long providerId, String authorizationHeader) {
         String url = userServiceBaseUrl + userDetailsPath;
         try {
             return restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     new HttpEntity<>(authHeaders(authorizationHeader)),
-                    ProviderProfileResponse.class,
+                    ProviderProfile.class,
                     providerId
             ).getBody();
         } catch (RestClientException exception) {
@@ -89,5 +88,13 @@ public class ExternalServiceClient {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorizationHeader);
         return headers;
+    }
+
+    public record ProviderProfile(
+            Long id,
+            String username,
+            String role,
+            String professionType
+    ) {
     }
 }

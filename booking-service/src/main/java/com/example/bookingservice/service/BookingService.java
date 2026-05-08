@@ -8,11 +8,12 @@ import com.example.bookingservice.dto.CompletedProviderOfferResponse;
 import com.example.bookingservice.dto.CreateBookingRequest;
 import com.example.bookingservice.dto.OfferBookingSummaryResponse;
 import com.example.bookingservice.dto.OfferResponse;
+import com.example.bookingservice.dto.WalletBalanceResponse;
 import com.example.bookingservice.entity.Booking;
 import com.example.bookingservice.entity.BookingStatus;
 import com.example.bookingservice.exception.InsufficientBalanceException;
 import com.example.bookingservice.exception.InvalidBookingStateException;
-import com.example.bookingservice.exception.OfferUnavailableException;
+import com.example.bookingservice.exception.PaymentException;
 import com.example.bookingservice.exception.ResourceNotFoundException;
 import com.example.bookingservice.exception.UnauthorizedActionException;
 import com.example.bookingservice.messaging.BookingEvent;
@@ -53,19 +54,75 @@ public class BookingService {
         if (offer == null) {
             throw new ResourceNotFoundException("Offer not found: " + request.offerId());
         }
+        BigDecimal amount = offer.price();
         if (!isOfferAvailableForBooking(offer)) {
             log.warn("BOOKING REJECTED OFFER UNAVAILABLE offerId={} availabilityStatus={} availableDateTime={} legacyAvailable={}",
                     offer.id(),
                     offer.availabilityStatus(),
                     offer.availableDateTime(),
                     offer.available());
-            throw new OfferUnavailableException("Offer is not available");
+            Booking rejectedBooking = saveBooking(authenticatedUser, offer, amount, BookingStatus.REJECTED, nowUtc());
+            publishLifecycleEvent(rejectedBooking, "Booking rejected because the offer is unavailable");
+            return toResponse(rejectedBooking);
         }
 
-        BigDecimal amount = offer.price();
         LocalDateTime now = nowUtc();
-        BookingStatus initialStatus = determineInitialStatus(offer, authenticatedUser, authorizationHeader, amount, now);
+        boolean walletDeducted = false;
+        try {
+            WalletBalanceResponse walletBalance = externalServiceClient.fetchWalletBalance(
+                    authenticatedUser.userId(),
+                    authorizationHeader
+            );
+            if (walletBalance == null || walletBalance.balance() == null
+                    || walletBalance.balance().compareTo(amount) < 0) {
+                Booking rejectedBooking = saveBooking(authenticatedUser, offer, amount, BookingStatus.REJECTED, now);
+                publishLifecycleEvent(rejectedBooking, "Booking rejected because the wallet balance is insufficient");
+                return toResponse(rejectedBooking);
+            }
 
+            externalServiceClient.deductWalletBalance(authenticatedUser.userId(), amount, authorizationHeader);
+            walletDeducted = true;
+            Booking confirmedBooking = saveBooking(authenticatedUser, offer, amount, BookingStatus.CONFIRMED, now);
+            log.info("BOOKING CREATED bookingId={} status={} customerId={} providerId={}",
+                    confirmedBooking.getId(),
+                    confirmedBooking.getStatus(),
+                    confirmedBooking.getCustomerId(),
+                    confirmedBooking.getProviderId());
+            publishLifecycleEvent(confirmedBooking, "Booking confirmed successfully");
+            return toResponse(confirmedBooking);
+        } catch (InsufficientBalanceException ex) {
+            log.info("BOOKING TRANSITION REJECTED customerId={} offerId={} amount={} reason={}",
+                    authenticatedUser.userId(),
+                    offer.id(),
+                    amount,
+                    ex.getMessage());
+            Booking rejectedBooking = saveBooking(authenticatedUser, offer, amount, BookingStatus.REJECTED, now);
+            publishLifecycleEvent(rejectedBooking, "Booking rejected because the wallet balance is insufficient");
+            return toResponse(rejectedBooking);
+        } catch (PaymentException ex) {
+            log.warn("BOOKING TRANSITION REJECTED PAYMENT ERROR customerId={} offerId={} amount={} reason={}",
+                    authenticatedUser.userId(),
+                    offer.id(),
+                    amount,
+                    ex.getMessage());
+            Booking rejectedBooking = saveBooking(authenticatedUser, offer, amount, BookingStatus.REJECTED, now);
+            publishLifecycleEvent(rejectedBooking, "Booking rejected because payment could not be processed");
+            return toResponse(rejectedBooking);
+        } catch (RuntimeException ex) {
+            if (walletDeducted) {
+                externalServiceClient.refundWalletBalance(authenticatedUser.userId(), amount, authorizationHeader);
+            }
+            throw ex;
+        }
+    }
+
+    private Booking saveBooking(
+            AuthenticatedUser authenticatedUser,
+            OfferResponse offer,
+            BigDecimal amount,
+            BookingStatus status,
+            LocalDateTime bookingDate
+    ) {
         Booking booking = Booking.builder()
                 .customerId(authenticatedUser.userId())
                 .customerName(authenticatedUser.displayName())
@@ -74,21 +131,12 @@ public class BookingService {
                 .serviceTitle(offer.title())
                 .category(offer.category())
                 .amount(amount)
-                .bookingDate(now)
+                .bookingDate(bookingDate)
                 .availableDateTime(offer.availableDateTime())
-                .status(initialStatus)
+                .status(status)
                 .build();
 
-        Booking savedBooking = bookingRepository.save(booking);
-        log.info("BOOKING CREATED bookingId={} status={} customerId={} providerId={}",
-                savedBooking.getId(),
-                savedBooking.getStatus(),
-                savedBooking.getCustomerId(),
-                savedBooking.getProviderId());
-
-        publishLifecycleEvent(savedBooking);
-
-        return toResponse(savedBooking);
+        return bookingRepository.save(booking);
     }
 
     @Transactional(readOnly = true)
@@ -199,7 +247,7 @@ public class BookingService {
         booking.setStatus(BookingStatus.COMPLETED);
         Booking savedBooking = bookingRepository.save(booking);
         log.info("BOOKING COMPLETED bookingId={} providerId={}", savedBooking.getId(), savedBooking.getProviderId());
-        publishLifecycleEvent(savedBooking);
+        publishLifecycleEvent(savedBooking, "Booking marked as completed");
         return toResponse(savedBooking);
     }
 
@@ -226,52 +274,6 @@ public class BookingService {
             return;
         }
         throw new UnauthorizedActionException("Unauthorized user");
-    }
-
-    private BookingStatus determineInitialStatus(
-            OfferResponse offer,
-            AuthenticatedUser authenticatedUser,
-            String authorizationHeader,
-            BigDecimal amount,
-            LocalDateTime now
-    ) {
-        LocalDateTime availableDateTime = offer.availableDateTime();
-        if (availableDateTime == null && !isManuallyAvailable(offer)) {
-            throw new IllegalArgumentException("Offer availableDateTime is required");
-        }
-
-        if (availableDateTime != null && now.isBefore(availableDateTime)) {
-            log.info("BOOKING TRANSITION PENDING customerId={} offerId={} availableDateTime={}",
-                    authenticatedUser.userId(),
-                    offer.id(),
-                    availableDateTime);
-            return BookingStatus.PENDING;
-        }
-
-        return confirmBooking(offer, authenticatedUser, authorizationHeader, amount);
-    }
-
-    private BookingStatus confirmBooking(
-            OfferResponse offer,
-            AuthenticatedUser authenticatedUser,
-            String authorizationHeader,
-            BigDecimal amount
-    ) {
-        try {
-            externalServiceClient.deductWalletBalance(authenticatedUser.userId(), amount, authorizationHeader);
-            log.info("BOOKING TRANSITION CONFIRMED customerId={} offerId={} amount={}",
-                    authenticatedUser.userId(),
-                    offer.id(),
-                    amount);
-            return BookingStatus.CONFIRMED;
-        } catch (InsufficientBalanceException ex) {
-            log.info("BOOKING TRANSITION REJECTED customerId={} offerId={} amount={} reason={}",
-                    authenticatedUser.userId(),
-                    offer.id(),
-                    amount,
-                    ex.getMessage());
-            return BookingStatus.REJECTED;
-        }
     }
 
     private boolean isOfferAvailableForBooking(OfferResponse offer) {
@@ -314,14 +316,18 @@ public class BookingService {
         return offer.availabilityStatus() == null ? null : offer.availabilityStatus().trim();
     }
 
-    private void publishLifecycleEvent(Booking booking) {
+    private void publishLifecycleEvent(Booking booking, String message) {
         bookingEventPublisher.publishBookingEvent(new BookingEvent(
+                eventTypeFor(booking.getStatus()),
                 booking.getId(),
                 booking.getCustomerId(),
                 booking.getProviderId(),
+                booking.getOfferId(),
+                booking.getServiceTitle(),
+                booking.getCategory(),
                 publicStatus(booking.getStatus()),
                 booking.getAmount(),
-                eventTypeFor(booking.getStatus())
+                message
         ));
     }
 

@@ -163,6 +163,25 @@ public class UserController {
         }
     }
 
+    @POST
+    @Path("/wallet/refund/{userId}")
+    public Response refundWallet(@PathParam("userId") Long userId, WalletDeductRequest request) {
+        try {
+            double amount = request == null ? 0 : request.getAmount();
+            double newBalance = userServiceBean.refundWallet(userId, amount);
+            return Response.ok(Map.of(
+                    "message", "Wallet refunded successfully",
+                    "newBalance", newBalance
+            )).build();
+        } catch (UserNotFoundException exception) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("message", exception.getMessage()))
+                    .build();
+        } catch (IllegalArgumentException exception) {
+            return badRequest(exception.getMessage());
+        }
+    }
+
     private Response badRequest(String message) {
         return Response.status(Response.Status.BAD_REQUEST)
                 .entity(Map.of("message", message))

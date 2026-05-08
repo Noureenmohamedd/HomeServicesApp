@@ -17,12 +17,8 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
     @Query("""
             select offer
             from Offer offer
-            where offer.available = true
-              and offer.availableDateTime > :now
-              and (
-                    offer.availabilityStatus is null
-                    or upper(offer.availabilityStatus) in ('AVAILABLE', 'FUTURE_AVAILABLE')
-                  )
+            where offer.availableDateTime > :now
+              and upper(offer.availabilityStatus) = 'AVAILABLE'
             order by offer.availableDateTime asc
             """)
     List<Offer> findActiveOffers(@Param("now") LocalDateTime now);
@@ -31,12 +27,8 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             select offer
             from Offer offer
             where offer.providerId = :providerId
-              and offer.available = true
               and offer.availableDateTime > :now
-              and (
-                    offer.availabilityStatus is null
-                    or upper(offer.availabilityStatus) in ('AVAILABLE', 'FUTURE_AVAILABLE')
-                  )
+              and upper(offer.availabilityStatus) = 'AVAILABLE'
             order by offer.availableDateTime asc
             """)
     List<Offer> findActiveOffersByProviderId(
@@ -48,10 +40,8 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             select offer
             from Offer offer
             where lower(offer.category) = lower(:category)
-              and (
-                    upper(offer.availabilityStatus) = 'AVAILABLE'
-                    or (offer.availabilityStatus is null and offer.availableDateTime >= :now)
-                  )
+              and upper(offer.availabilityStatus) = 'AVAILABLE'
+              and offer.availableDateTime >= :now
             order by offer.availableDateTime asc
             """)
     List<Offer> findBookableOffersByCategory(

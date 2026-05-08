@@ -45,6 +45,9 @@ public class ExternalServiceClient {
     @Value("${services.user-service.wallet-deduct-path}")
     private String walletDeductPath;
 
+    @Value("${services.user-service.wallet-refund-path}")
+    private String walletRefundPath;
+
     public OfferResponse fetchOffer(Long offerId, String authorizationHeader) {
         log.info("FETCHING OFFER offerId={}", offerId);
         String url = offerServiceBaseUrl + "/api/offers/{offerId}";
@@ -127,6 +130,30 @@ public class ExternalServiceClient {
         } catch (RestClientException ex) {
             log.warn("USER SERVICE WALLET DEDUCT CALL FAILED customerId={} message={}", customerId, ex.getMessage());
             throw new PaymentException("Unable to deduct wallet balance");
+        }
+    }
+
+    public void refundWalletBalance(Long customerId, BigDecimal amount, String authorizationHeader) {
+        String url = userServiceBaseUrl + walletRefundPath;
+        HttpHeaders headers = authHeaders(authorizationHeader);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        try {
+            log.info("REFUNDING WALLET BALANCE customerId={} amount={} url={}", customerId, amount, url);
+            restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(new DeductWalletRequest(amount), headers),
+                    Void.class,
+                    Map.of("userId", customerId, "customerId", customerId)
+            );
+            log.info("PAYMENT REFUND SUCCESS customerId={} amount={}", customerId, amount);
+        } catch (RestClientException ex) {
+            log.error("USER SERVICE WALLET REFUND FAILED customerId={} amount={} message={}",
+                    customerId,
+                    amount,
+                    ex.getMessage());
+            throw new PaymentException("Unable to refund wallet balance");
         }
     }
 

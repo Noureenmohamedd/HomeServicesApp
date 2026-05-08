@@ -17,7 +17,6 @@ public class ActiveOfferResponse {
     private String description;
     private String category;
     private BigDecimal price;
-    private boolean available;
     private String availabilityStatus;
     private LocalDateTime availableDateTime;
     private Long providerId;

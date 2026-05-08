@@ -17,7 +17,6 @@ public class OfferResponse {
     private String title;
     private String description;
     private BigDecimal price;
-    private Boolean available;
     private String category;
     private LocalDateTime availableDateTime;
     private String availabilityStatus;

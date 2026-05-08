@@ -24,7 +24,15 @@ public class NotificationPublisher {
     public void publishBookingFailure(NotificationMessage message) {
         rabbitTemplate.convertAndSend(
                 RabbitMqConfig.BOOKING_EXCHANGE,
-                RabbitMqConfig.BOOKING_FAILURE_ROUTING_KEY,
+                RabbitMqConfig.BOOKING_REJECTION_ROUTING_KEY,
+                message
+        );
+    }
+
+    public void publishBookingCompletion(NotificationMessage message) {
+        rabbitTemplate.convertAndSend(
+                RabbitMqConfig.BOOKING_EXCHANGE,
+                RabbitMqConfig.BOOKING_COMPLETION_ROUTING_KEY,
                 message
         );
     }

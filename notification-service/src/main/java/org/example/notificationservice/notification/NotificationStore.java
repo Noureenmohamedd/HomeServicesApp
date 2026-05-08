@@ -1,24 +1,22 @@
 package org.example.notificationservice.notification;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @Repository
 public class NotificationStore {
 
-    private final ConcurrentMap<Long, List<NotificationResponse>> customerNotifications = new ConcurrentHashMap<>();
-    private final ConcurrentMap<Long, List<NotificationResponse>> providerNotifications = new ConcurrentHashMap<>();
+    private final NotificationRepository notificationRepository;
 
+    public NotificationStore(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
+
+    @Transactional
     public NotificationResponse save(NotificationMessage message, RecipientType recipientType, Long recipientId) {
-        NotificationResponse notification = new NotificationResponse(
-                UUID.randomUUID(),
+        NotificationEntity notification = new NotificationEntity(
                 message.type(),
                 message.message(),
                 message.customerId(),
@@ -28,27 +26,27 @@ public class NotificationStore {
                 message.amount(),
                 message.status(),
                 recipientType,
-                recipientId,
-                Instant.now()
+                recipientId
         );
 
-        ConcurrentMap<Long, List<NotificationResponse>> targetStore = recipientType == RecipientType.CUSTOMER
-                ? customerNotifications
-                : providerNotifications;
-        targetStore.compute(recipientId, (id, notifications) -> {
-            List<NotificationResponse> updated = notifications == null ? new ArrayList<>() : new ArrayList<>(notifications);
-            updated.add(notification);
-            updated.sort(Comparator.comparing(NotificationResponse::createdAt).reversed());
-            return updated;
-        });
-        return notification;
+        return notificationRepository.save(notification).toResponse();
     }
 
+    @Transactional(readOnly = true)
     public List<NotificationResponse> findByCustomerId(Long customerId) {
-        return List.copyOf(customerNotifications.getOrDefault(customerId, List.of()));
+        return findByRecipient(RecipientType.CUSTOMER, customerId);
     }
 
+    @Transactional(readOnly = true)
     public List<NotificationResponse> findByProviderId(Long providerId) {
-        return List.copyOf(providerNotifications.getOrDefault(providerId, List.of()));
+        return findByRecipient(RecipientType.SERVICE_PROVIDER, providerId);
+    }
+
+    private List<NotificationResponse> findByRecipient(RecipientType recipientType, Long recipientId) {
+        return notificationRepository
+                .findByRecipientTypeAndRecipientIdOrderByCreatedAtDesc(recipientType, recipientId)
+                .stream()
+                .map(NotificationEntity::toResponse)
+                .toList();
     }
 }
